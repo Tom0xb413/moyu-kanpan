@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Build output
+build/work/
+dist/
+
+# Local data, logs and debug artifacts
+*.log
+.workbuddy/
+.shot-profile/
+.gh_token
+
+# Editor / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

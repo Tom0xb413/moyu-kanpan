@@ -1,0 +1,8 @@
+pywebview==6.2.1
+pythonnet==3.2.1
+aiohttp==3.12.13
+pystray==0.19.5
+pillow>=10
+# 仅打包时需要
+pyinstaller==6.21.0
+pyinstaller-hooks-contrib==2026.6

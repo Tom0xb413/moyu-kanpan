@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="app-token" content="__TOKEN__">
+<title>摸鱼看盘</title>
+<link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div id="app">
+  <header id="bar">
+    <div class="grip" id="grip" title="拖动">
+      <svg viewBox="0 0 10 16" width="8" height="14" aria-hidden="true">
+        <g fill="currentColor">
+          <circle cx="3" cy="4" r="1"/><circle cx="7" cy="4" r="1"/>
+          <circle cx="3" cy="8" r="1"/><circle cx="7" cy="8" r="1"/>
+          <circle cx="3" cy="12" r="1"/><circle cx="7" cy="12" r="1"/>
+        </g>
+      </svg>
+    </div>
+
+    <button id="symBtn" class="sym" title="搜索标的 (Ctrl+K)">
+      <span id="symName">BTC/USDT</span>
+      <span class="tag" id="symTag">合约</span>
+    </button>
+
+    <div class="px">
+      <span id="last">—</span>
+      <span id="chg" class="chg">—</span>
+    </div>
+
+    <div class="acts">
+      <button id="btnSearch" class="ico" title="搜索 (Ctrl+K)">
+        <svg viewBox="0 0 16 16" width="14" height="14"><circle cx="6.6" cy="6.6" r="4.2" fill="none" stroke="currentColor" stroke-width="1.25"/><path d="M9.8 9.8L13.6 13.6" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+      </button>
+      <button id="btnFav" class="ico" title="收藏当前标的 (F)" aria-pressed="false">
+        <svg viewBox="0 0 16 16" width="14" height="14"><path d="M8 1.9l1.9 3.85 4.25.62-3.07 3 .72 4.23L8 11.63 4.2 13.6l.72-4.23-3.07-3 4.25-.62z" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>
+      </button>
+      <button id="btnPin" class="ico on" title="置顶">
+        <svg viewBox="0 0 16 16" width="14" height="14"><path d="M9.4 2.2l4.4 4.4-2.2.5-1.1 2.9-1.8-1.8-3.9 3.9-1.1-1.1 3.9-3.9L6.5 5.3l2.9-1.1z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+      </button>
+      <button id="btnAlpha" class="ico" title="透明度">
+        <svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="5.4" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M8 2.6a5.4 5.4 0 010 10.8z" fill="currentColor" opacity=".55"/></svg>
+      </button>
+      <button id="btnCollapse" class="ico" title="收起为滚动条 (Ctrl+Alt+M)">
+        <svg viewBox="0 0 16 16" width="14" height="14"><path d="M3.4 6.6L8 10.4l4.6-3.8" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.6 12.6h8.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      </button>
+      <button id="btnMenu" class="ico" title="更多">
+        <svg viewBox="0 0 16 16" width="14" height="14"><g fill="currentColor"><circle cx="3.4" cy="8" r="1.1"/><circle cx="8" cy="8" r="1.1"/><circle cx="12.6" cy="8" r="1.1"/></g></svg>
+      </button>
+      <button id="btnClose" class="ico close" title="关闭（可最小化到托盘并保留实时价位）">
+        <svg viewBox="0 0 16 16" width="13" height="13"><path d="M4.2 4.2l7.6 7.6M11.8 4.2l-7.6 7.6" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="periods">
+    <div class="tf" id="tf">
+      <button data-p="15m">15M</button>
+      <button data-p="1h">1H</button>
+      <button data-p="4h">4H</button>
+      <button data-p="8h">8H</button>
+      <button data-p="1d">1D</button>
+      <button data-p="1w">1W</button>
+    </div>
+    <div class="tf-right">
+      <button id="favPrev" class="ico small arrow" title="上一个收藏 (↑)" disabled>▲</button>
+      <button id="favNext" class="ico small arrow" title="下一个收藏 (↓)" disabled>▼</button>
+      <button id="btnEma" class="txt" title="EMA 设置">EMA</button>
+      <button id="btnRefresh" class="ico small" title="刷新">
+        <svg viewBox="0 0 16 16" width="13" height="13"><path d="M13 8a5 5 0 11-1.6-3.7M13 2.6V5h-2.4" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div id="legend" class="legend"></div>
+  <div class="chart-wrap">
+    <div id="chart" class="chart"></div>
+    <div id="older" class="older hidden"><span class="spin"></span><span id="olderText">加载更早…</span></div>
+    <div id="prog" class="prog hidden">
+      <div class="prog-card">
+        <div class="prow"><span class="spin"></span><span id="progText">连接行情…</span></div>
+        <div class="prow sub"><span id="progSub">BTC/USDT · 15M</span><span id="progElapsed">0.0s</span></div>
+        <button id="progCancel" class="pbtn">取消</button>
+      </div>
+    </div>
+  </div>
+  <div id="hint" class="hint hidden"></div>
+  <div id="status" class="status"><span id="stLeft">连接中…</span><span id="stRight"></span></div>
+
+  <!-- 收起模式：常驻滚动条 -->
+  <div id="strip" class="strip">
+    <div class="strip-grip" id="stripGrip" title="拖动">
+      <svg viewBox="0 0 10 16" width="7" height="12" aria-hidden="true">
+        <g fill="currentColor"><circle cx="3" cy="5" r="1"/><circle cx="7" cy="5" r="1"/><circle cx="3" cy="9" r="1"/><circle cx="7" cy="9" r="1"/><circle cx="3" cy="13" r="1"/><circle cx="7" cy="13" r="1"/></g>
+      </svg>
+    </div>
+    <div class="strip-items" id="stripItems"></div>
+    <div class="strip-nav">
+      <span class="strip-page" id="stripPage">1/1</span>
+      <button id="stripExpand" class="ico tiny" title="展开完整窗口 (Ctrl+Alt+M)">
+        <svg viewBox="0 0 16 16" width="12" height="12"><path d="M3.4 9.4L8 5.6l4.6 3.8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- 搜索浮层 -->
+  <div id="searchLayer" class="layer hidden">
+    <div class="search-box">
+      <div class="search-input">
+        <svg viewBox="0 0 16 16" width="13" height="13"><circle cx="6.6" cy="6.6" r="4.2" fill="none" stroke="currentColor" stroke-width="1.25"/><path d="M9.8 9.8L13.6 13.6" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+        <input id="q" type="text" name="mxq" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="代码或名称，如 BTC / 英伟达 / NVDA">
+        <button id="qClear" class="ico tiny" title="清空">×</button>
+      </div>
+      <div id="chipBar" class="chips hidden">
+        <div class="chip-sec" id="chipRecentSec">
+          <span class="chip-lb">近期</span>
+          <div class="chip-row" id="chipRecent"></div>
+        </div>
+        <div class="chip-sec hidden" id="chipWatchSec">
+          <span class="chip-lb">收藏</span>
+          <div class="chip-row" id="chipWatch"></div>
+        </div>
+      </div>
+      <div id="results" class="results"></div>
+      <div class="search-foot"><span id="searchTip">↑↓ 选择 · Enter 确认 · Esc 关闭</span><span id="searchCount"></span></div>
+    </div>
+  </div>
+
+  <!-- EMA 面板 -->
+  <div id="emaPanel" class="pop hidden">
+    <div class="pop-title">EMA 均线</div>
+    <div id="emaRows"></div>
+    <div class="pop-tip">修改参数会即时重算，无需重新拉数据</div>
+  </div>
+
+  <!-- 菜单 -->
+  <div id="menu" class="pop menu hidden">
+    <div class="menu-row" id="miTop">
+      <span>窗口置顶</span><span class="switch on" id="swTop"><i></i></span>
+    </div>
+    <div class="menu-row" id="miVol">
+      <span>成交量</span><span class="switch on" id="swVol"><i></i></span>
+    </div>
+    <div class="menu-alpha">
+      <div class="menu-row noborder"><span>不透明度</span><span id="alphaVal">95%</span></div>
+      <input id="alphaRange" type="range" min="40" max="100" value="95">
+    </div>
+    <div class="menu-sep"></div>
+    <button class="menu-item" id="miHide"><span>立即隐身</span><kbd>Ctrl+Alt+H</kbd></button>
+    <button class="menu-item" id="miStrip"><span>滚动条标的…</span><span class="cnt" id="miStripCount">0/20</span></button>
+    <button class="menu-item" id="miStripDir"><span>价位条方向</span><span class="cnt" id="miStripDirVal">横向</span></button>
+    <button class="menu-item" id="miClose"><span>关闭行为…</span><span class="cnt" id="miCloseVal">每次询问</span></button>
+    <button class="menu-item" id="miDiag"><span>数据源诊断</span></button>
+    <button class="menu-item" id="miQuit"><span>退出</span></button>
+  </div>
+
+  <div id="stripLayer" class="layer hidden">
+    <div class="diag-box strip-box">
+      <div class="diag-head">滚动条标的 · 最多 20 个<button id="stripClose" class="ico tiny">×</button></div>
+      <div id="stripList" class="strip-list"></div>
+      <div class="strip-foot">
+        <span>每页 5 个 · 6 秒翻页</span>
+        <button id="stripAll" class="pbtn">全选收藏</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="diag" class="layer hidden"><div class="diag-box"><div class="diag-head">数据源诊断<button id="diagClose" class="ico tiny">×</button></div><pre id="diagBody"></pre></div></div>
+
+  <!-- 关闭行为：问询 / 设置 -->
+  <div id="exitLayer" class="layer hidden">
+    <div class="exit-box">
+      <div class="exit-head"><span id="exitTitle">关闭窗口</span><button id="exitX" class="ico tiny" title="取消">×</button></div>
+      <div class="exit-body">
+        <p class="exit-desc" id="exitDesc">要直接退出，还是隐藏窗口、只在通知区保留实时价位条？</p>
+        <div id="exitAsk">
+          <div class="exit-acts">
+            <button class="ebtn" data-act="quit">直接退出</button>
+            <button class="ebtn primary" data-act="tray">保留实时价位 · 最小化到托盘</button>
+          </div>
+          <label class="exit-remember"><input type="checkbox" id="exitRemember"><span>不再询问，下次直接按此执行</span></label>
+          <div class="exit-note">托盘图标会常驻，右键可随时真正退出；「关闭行为…」可改回询问。</div>
+        </div>
+        <div id="exitSettings" class="hidden">
+          <label class="exit-radio"><input type="radio" name="exitMode" value="ask"><span>每次询问</span></label>
+          <label class="exit-radio"><input type="radio" name="exitMode" value="quit"><span>直接退出</span></label>
+          <label class="exit-radio"><input type="radio" name="exitMode" value="tray"><span>最小化到托盘并保留实时价位</span></label>
+          <button class="ebtn primary wide" id="exitSave">保存</button>
+        </div>
+      </div>
+      <div class="exit-foot"><button id="exitCancel" class="ebtn ghost">取消</button></div>
+    </div>
+  </div>
+
+  <!-- 8 向缩放热区 -->
+  <div class="rz rz-t" data-edge="t"></div>
+  <div class="rz rz-b" data-edge="b"></div>
+  <div class="rz rz-l" data-edge="l"></div>
+  <div class="rz rz-r" data-edge="r"></div>
+  <div class="rz rz-tl" data-edge="tl"></div>
+  <div class="rz rz-tr" data-edge="tr"></div>
+  <div class="rz rz-bl" data-edge="bl"></div>
+  <div class="rz rz-br" data-edge="br"></div>
+</div>
+
+<script src="/vendor/lightweight-charts.standalone.production.js"></script>
+<script src="/js/format.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/ema.js"></script>
+<script src="/js/chart.js"></script>
+<script src="/js/search.js"></script>
+<script src="/js/strip.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>
